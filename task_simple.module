@@ -1,0 +1,152 @@
+<?php
+
+// $id$
+
+/* 
+ * define how many tasks will be listed in list mode of tasks
+ */
+define (TASK_SIMPLE_PAGER, variable_get('task_simple_pager', 5));
+
+/**
+ * set default timezone, so user will have his own timezone
+ * Otherwise use system timezone
+ * Setting $user to global: Do not know if this is best practice?
+ */
+
+global $user;
+if (!empty($user->timezone_name)){
+  if (variable_get('task_simple_timezone', 0)){
+    date_default_timezone_set($user->timezone_name);
+  }
+}
+
+/* 
+ * Notes to remember about Drupal: 
+ * add a ccs in this way: 
+ * drupal_add_css(drupal_get_path('module', 'task_simple') .'/task_simple.css');
+ * Create perms like this: return array('access newmodule', 'create newmodule', 'administer newmodule');
+ * Valid permissions for this module:
+ * only two settings for this module 
+ * You can access content or you can create content
+ */
+
+/* 
+ * @return an array of valid permissions for the onthisdate module
+ */
+function task_simple_perm() {
+  return array('access task_simple content', 'create task_simple content', 'administer task_simple settings');
+}
+
+/* 
+ * function for creating menus
+ * @returns menu items
+ */
+function task_simple_menu() {
+
+  $items = array();
+
+  //admin menu for settings
+  $items['admin/settings/task_simple'] = array(
+    'title' => 'Task simple module settings',
+    'description' => 'Description of Task simple settings control',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('task_simple_admin'),
+    'access arguments' => array('administer task_simple settings'),
+    'file' => 'task_simple.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  //user menus
+  
+  //normal item for navigation menu 
+  $items['task_simple'] = array(
+    'title' => t('Tasks'),
+    'page callback' => 'task_simple_list_future',
+    'access arguments' => array('create task_simple content'),
+    'file' => 'task_simple.user.inc',
+    'type' => MENU_NORMAL_ITEM
+  );
+  
+  //user menu for listing tasks
+  $items['task_simple/list'] = array(
+    'title' => t('View'),
+    'page callback' => 'task_simple_list_future',
+    'access arguments' => array('create task_simple content'),
+    'file' => 'task_simple.user.inc',
+    'weight' => 2,
+    'type' => MENU_DEFAULT_LOCAL_TASK
+  );
+  
+  //user menu for add task 
+  $items['task_simple/add_task'] = array(
+    'title' => 'Add task',
+    'page callback' => 'task_simple_add_task',
+    'access arguments' => array('create task_simple content'),
+    'file' => 'task_simple.user.inc',
+    'weight' => 3,
+    'type' => MENU_LOCAL_TASK
+  );
+  
+  //user menu for add task 
+  $items['task_simple/search_task'] = array(
+    'title' => 'Search',
+    'page callback' => 'task_simple_search_task',
+    'access arguments' => array('create task_simple content'),
+    'file' => 'task_simple.user.inc',
+    'weight' => 3,
+    'type' => MENU_LOCAL_TASK
+  );
+  
+  //user menu for listing tasks
+  $items['task_simple/list/list_future'] = array(
+    'title' => t('Future'),
+    'page callback' => 'task_simple_list_future',
+    'access arguments' => array('create task_simple content'),
+    'file' => 'task_simple.user.inc',
+    'weight' => 2,
+    'type' => MENU_DEFAULT_LOCAL_TASK
+  );
+  
+  //user menu for listing tasks
+  $items['task_simple/list/list_past'] = array(
+    'title' => t('Past'),
+    'page callback' => 'task_simple_list_past',
+    'access arguments' => array('create task_simple content'),
+    'file' => 'task_simple.user.inc',
+    'weight' => 3,
+    'type' => MENU_LOCAL_TASK
+  );
+  
+  //user menu for listing tasks
+  $items['task_simple/list/list_all'] = array(
+    'title' => t('All'),
+    'page callback' => 'task_simple_list_all',
+    'access arguments' => array('create task_simple content'),
+    'file' => 'task_simple.user.inc',
+    'weight' => 4,
+    'type' => MENU_LOCAL_TASK
+  );
+
+  //user menu for editing a task
+  $items['task_simple/edit_task'] = array(
+    'title' => 'Edit Task',
+    'page callback' => 'task_simple_edit_task',
+    'access arguments' => array('create task_simple content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'task_simple.user.inc',
+  );
+  
+  //user menu for deleting a task
+  $items['task_simple/delete_task'] = array(
+    'title' => 'Delete Task',
+    //using page callback
+    'page callback' => 'drupal_get_form',
+    //and using arguments
+    'page arguments' => array('task_simple_delete_task'),
+    'access arguments' => array('create task_simple content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'task_simple.user.inc',
+  );
+  return $items;
+}
+

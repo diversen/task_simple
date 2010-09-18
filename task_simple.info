@@ -1,0 +1,9 @@
+; $Id
+name = Task Simple
+description = Provides a simple task system for users
+dependencies[] = date_api
+dependencies[] = date_popup
+dependencies[] = date_timezone
+core = 6.x
+version = 6.x-1
+

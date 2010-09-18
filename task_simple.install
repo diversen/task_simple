@@ -1,0 +1,79 @@
+<?php
+
+// $Id$
+
+/*
+ * Implementation of hook_install().
+ */
+function task_simple_install() {
+  global $user;
+  drupal_install_schema('task_simple');
+
+}
+
+/* 
+ * Implementation of hook_uninstall().
+ */
+function task_simple_uninstall() {
+  // Remove tables.
+  drupal_uninstall_schema('task_simple');
+}
+
+/* 
+ * Implementation of hook_schema().
+ */
+function task_simple_schema() {
+  $schema['task'] = array(
+    'description' => 'The base table for tasks.',
+    'fields' => array(
+
+      'tid' => array(
+        'description' => 'The primary identifier for a task.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+
+      'title' => array(
+        'description' => 'The title of this task, always treated as non-markup plain text.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => ''),
+      
+      'description' => array(
+        'description' => 'The description of the task',
+        'type' => 'varchar',
+        'length' => 1024,
+        'not null' => TRUE,
+        'default' => ''),
+
+      'uid' => array(
+        'description' => 'The {users}.uid that owns this task; initially, this is the user that created it.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0),
+
+      'due' => array(
+        'description' => 'The Unix timestamp when the task was created.',
+        'type' => 'datetime',
+        'not null' => TRUE,
+        'default' => 0),
+
+      'progress' => array(
+        'description' => 'The progress of the task.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0),
+
+      ),
+
+    'indexes' => array(
+      'due'        => array('due'),
+      'uid'                 => array('uid'),
+      ),
+
+    'primary key' => array('tid'),
+  );
+  return $schema;
+}
+
